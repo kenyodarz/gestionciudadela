@@ -7,4 +7,6 @@ public interface MaterialServiceAPI extends GenericServiceAPI<Material, String> 
     Material findMaterialByWithStock(String id);
 
     Material findByIdentificador(String id);
+
+    Boolean existsByIdentificador(String id);
 }

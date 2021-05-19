@@ -1,6 +1,7 @@
 package com.bykenyodarz.gestionciudadela.controllers;
 
 import com.bykenyodarz.gestionciudadela.models.Material;
+import com.bykenyodarz.gestionciudadela.security.utils.messages.MessageResponse;
 import com.bykenyodarz.gestionciudadela.services.apis.MaterialServiceAPI;
 import com.bykenyodarz.gestionciudadela.shared.GenericRestController;
 import io.swagger.annotations.ApiOperation;
@@ -9,7 +10,10 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @CrossOrigin({"*"})
@@ -20,6 +24,29 @@ public class MaterialRestController extends GenericRestController<Material, Stri
     public MaterialRestController(MaterialServiceAPI serviceAPI) {
         super(serviceAPI);
         this.serviceAPI = serviceAPI;
+    }
+
+
+    @Override
+    @PostMapping("/save")
+    @ApiOperation(value = "Crear/Editar una Entidad", notes = "servicio para crear o editar entidades",
+            authorizations = {@Authorization(value = "jwtToken")})
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Entidad creada correctamente"),
+            @ApiResponse(code = 400, message = "Error en la Solicitud"),
+            @ApiResponse(code = 401, message = "Usuario No Autorizado"),
+            @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
+            @ApiResponse(code = 404, message = "Entidad no encontrada")})
+    public ResponseEntity<?> save(@Valid @RequestBody Material entity, BindingResult result) {
+        if (result.hasErrors()) {
+            return this.validar(result);
+        }
+        if(serviceAPI.existsByIdentificador(entity.getIdentificador())){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Este Identificador ya lo tiene otro producto!"));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(serviceAPI.save(entity));
     }
 
     @GetMapping("/with-stock/{id}")

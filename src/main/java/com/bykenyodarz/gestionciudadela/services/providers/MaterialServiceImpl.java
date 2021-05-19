@@ -33,4 +33,9 @@ public class MaterialServiceImpl extends GenericServiceImpl<Material, String> im
     public Material findByIdentificador(String id) {
         return this.repository.findByIdentificador(id).orElse(null);
     }
+
+    @Override
+    public Boolean existsByIdentificador(String id) {
+        return this.repository.existsByIdentificador(id);
+    }
 }

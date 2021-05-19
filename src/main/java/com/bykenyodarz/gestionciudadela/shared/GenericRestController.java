@@ -27,7 +27,8 @@ public abstract class GenericRestController<T, ID extends Serializable> {
     // Validador de campos
     public ResponseEntity<?> validar(BindingResult result) {
         Map<String, Object> errores = new HashMap<>();
-        result.getFieldErrors().forEach(err -> errores.put(err.getField(), " El campo " + err.getField() + " " + err.getDefaultMessage()));
+        result.getFieldErrors().forEach(err -> errores.put(err.getField(),
+                " El campo " + err.getField() + " " + err.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errores);
     }
 

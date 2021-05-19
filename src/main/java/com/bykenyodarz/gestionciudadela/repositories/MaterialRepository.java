@@ -13,4 +13,6 @@ public interface MaterialRepository extends JpaRepository<Material, String> {
     Optional<Material> findMaterialByWithStock(String id);
 
     Optional<Material> findByIdentificador(String id);
+
+    Boolean existsByIdentificador(String id);
 }
