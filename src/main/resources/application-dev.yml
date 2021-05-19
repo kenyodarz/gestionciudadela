@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/GESTION
+    username: postgres
+    password: cdm
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# App Properties
+Gestion:
+  app:
+    jwtSecret: RikQF3S3PcPbNixyhzpcr8N8R7XXUI64
+    jwtExpirationMs: 864000000
