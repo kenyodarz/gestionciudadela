@@ -5,3 +5,9 @@ spring:
 server:
   servlet:
     context-path: /gestion/api
+
+# App Properties
+Gestion:
+  app:
+    jwtSecret: RikQF3S3PcPbNixyhzpcr8N8R7XXUI64
+    jwtExpirationMs: 864000000
