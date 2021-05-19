@@ -11,7 +11,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username"),
+                @UniqueConstraint(columnNames = "email")
+        }
+)
 @Data
 public class Usuario {
 
@@ -26,12 +31,17 @@ public class Usuario {
 
     @NotBlank
     @Size(max = 50)
-    private String usuario;
+    @Column(name = "username")
+    private String username;
 
     @NotBlank
     @Size(max = 80)
     @Email
     private String email;
+
+    @NotBlank
+    @Size(max = 120)
+    private String password;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "usuarios_roles",
@@ -42,10 +52,10 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String idUsuario, String nombre, String usuario, String email) {
-        this.idUsuario = idUsuario;
+    public Usuario(String nombre, String nombreUsuario, String email, String password) {
         this.nombre = nombre;
-        this.usuario = usuario;
+        this.username = nombreUsuario;
         this.email = email;
+        this.password = password;
     }
 }
