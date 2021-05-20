@@ -7,13 +7,16 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "materiales", uniqueConstraints = {
         @UniqueConstraint(columnNames = "identificador")
 })
 @Data
-public class Material {
+public class Material implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(generator = "system-uuid")

@@ -4,13 +4,18 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "edificaciones", uniqueConstraints = {
         @UniqueConstraint(columnNames = "nombre")
 })
 @Data
-public class Edificacion {
+public class Edificacion implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -18,13 +23,11 @@ public class Edificacion {
     private String idEdificacion;
 
     @Column
+    @NotNull
     private Integer cantidadDias;
 
     @Column
+    @NotBlank
     private String nombre;
-
-    @OneToOne
-    @JoinColumn(name = "cantidad")
-    private CantidadMateriales materiales;
 }
 

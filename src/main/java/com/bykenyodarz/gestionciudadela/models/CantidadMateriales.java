@@ -7,32 +7,26 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "cantidad_materiales")
+@Table(name = "cantidad_materiales", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"identificador", "nombre"})
+})
 @Data
 public class CantidadMateriales {
     @Id
     @GeneratedValue(generator = "system-uuid")
     @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    private String cantidad;
+    private String idCantidad;
 
-    @Column(name = "ce")
     @NotNull
-    public Integer Ce;
+    @OneToOne
+    @JoinColumn(name = "identificador", referencedColumnName = "identificador")
+    private Material material;
 
-    @Column(name = "gr")
     @NotNull
-    public Integer Gr;
+    @OneToOne
+    @JoinColumn(name = "nombre", referencedColumnName = "nombre")
+    private Edificacion edificacion;
 
-    @Column(name = "ar")
-    @NotNull
-    public Integer Ar;
-
-    @Column(name = "ma")
-    @NotNull
-    public Integer  Ma;
-
-    @Column(name = "ad")
-    @NotNull
-    public Integer Ad;
-
+    @Column
+    private Integer cantidad;
 }

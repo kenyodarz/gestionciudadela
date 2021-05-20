@@ -49,7 +49,7 @@ public class MaterialRestController extends GenericRestController<Material, Stri
         return ResponseEntity.status(HttpStatus.OK).body(serviceAPI.save(entity));
     }
 
-    @GetMapping("/with-stock/{id}")
+    @GetMapping("/with-stock/{identificador}")
     @ApiOperation(value = "Obtener un material", notes = "Servicio para obtener un material con Stock mayor a 0",
             authorizations = {@Authorization(value = "jwtToken")})
     @ApiResponses(value = {
@@ -58,8 +58,8 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> findMaterialWithStock(@PathVariable String id) {
-        Material material = this.serviceAPI.findMaterialByWithStock(id);
+    public ResponseEntity<?> findMaterialWithStock(@PathVariable String identificador) {
+        Material material = this.serviceAPI.findMaterialByWithStock(identificador);
         if (material == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Material no Encontrado");
         } else {
@@ -67,7 +67,7 @@ public class MaterialRestController extends GenericRestController<Material, Stri
         }
     }
 
-    @GetMapping("/actualizar/{id}/{cantidad}")
+    @GetMapping("/actualizar/{identificador}/{cantidad}")
     @ApiOperation(value = "Actualiza un material", notes = "Servicio para Actualizar el stock"
             , authorizations = {@Authorization(value = "jwtToken")})
     @ApiResponses(value = {
@@ -76,13 +76,13 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> actualizarStock(@PathVariable String id, @PathVariable int cantidad) {
-        Material material = this.serviceAPI.findByIdentificador(id);
+    public ResponseEntity<?> actualizarStock(@PathVariable String identificador, @PathVariable int cantidad) {
+        Material material = this.serviceAPI.findByIdentificador(identificador);
         if (material == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Material no Encontrado");
         } else {
             material.setStock(material.getStock() + cantidad);
-            return ResponseEntity.ok().body(material);
+            return ResponseEntity.ok().body(serviceAPI.save(material));
         }
     }
 
