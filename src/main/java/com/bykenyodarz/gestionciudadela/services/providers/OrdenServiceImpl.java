@@ -20,4 +20,9 @@ public class OrdenServiceImpl extends GenericServiceImpl<Orden, String> implemen
     public JpaRepository<Orden, String> getJpaRepository() {
         return this.repository;
     }
+
+    @Override
+    public Boolean existsByCoordenadaXAndCoordenadaY(double coordinateX, double coordinateY) {
+        return this.repository.existsByCoordenadaXAndCoordenadaY(coordinateX, coordinateY);
+    }
 }

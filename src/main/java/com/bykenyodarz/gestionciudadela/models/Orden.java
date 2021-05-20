@@ -8,7 +8,9 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ordenes")
+@Table(name = "ordenes", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"coordenadax", "coordenaday"})
+})
 @Data
 public class Orden {
 
