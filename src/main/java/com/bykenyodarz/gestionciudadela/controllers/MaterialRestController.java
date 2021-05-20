@@ -4,12 +4,10 @@ import com.bykenyodarz.gestionciudadela.models.Material;
 import com.bykenyodarz.gestionciudadela.security.utils.messages.MessageResponse;
 import com.bykenyodarz.gestionciudadela.services.apis.MaterialServiceAPI;
 import com.bykenyodarz.gestionciudadela.shared.GenericRestController;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +16,7 @@ import javax.validation.Valid;
 @RestController
 @CrossOrigin({"*"})
 @RequestMapping("/material")
+@Api(tags = "Materiales")
 public class MaterialRestController extends GenericRestController<Material, String> {
     private final MaterialServiceAPI serviceAPI;
 
@@ -37,6 +36,7 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     public ResponseEntity<?> save(@Valid @RequestBody Material entity, BindingResult result) {
         if (result.hasErrors()) {
             return this.validar(result);
@@ -57,6 +57,7 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     public ResponseEntity<?> findMaterialWithStock(@PathVariable String id) {
         Material material = this.serviceAPI.findMaterialByWithStock(id);
         if (material == null) {
@@ -74,6 +75,7 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     public ResponseEntity<?> actualizarStock(@PathVariable String id, @PathVariable int cantidad) {
         Material material = this.serviceAPI.findByIdentificador(id);
         if (material == null) {

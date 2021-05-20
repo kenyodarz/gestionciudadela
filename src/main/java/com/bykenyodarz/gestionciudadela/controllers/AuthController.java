@@ -11,6 +11,7 @@ import com.bykenyodarz.gestionciudadela.security.utils.messages.JwtResponse;
 import com.bykenyodarz.gestionciudadela.security.utils.messages.MessageResponse;
 import com.bykenyodarz.gestionciudadela.security.utils.request.LoginRequest;
 import com.bykenyodarz.gestionciudadela.security.utils.request.SignupRequest;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
+@Api(tags = "Autentificación")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository userRepository;

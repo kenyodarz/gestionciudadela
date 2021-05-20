@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,7 @@ public abstract class GenericRestController<T, ID extends Serializable> {
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     public List<T> getAll() {
         return serviceAPI.getAll();
     }
@@ -59,6 +61,7 @@ public abstract class GenericRestController<T, ID extends Serializable> {
     }
 
     @PostMapping("/save")
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     @ApiOperation(value = "Crear/Editar una Entidad", notes = "servicio para crear o editar entidades",
             authorizations = {@Authorization(value = "jwtToken")})
     @ApiResponses(value = {
@@ -74,6 +77,7 @@ public abstract class GenericRestController<T, ID extends Serializable> {
     }
 
     @GetMapping("/delete/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     @ApiOperation(value = "Eliminar una Entidad", notes = "servicio para eliminar entidades",
             authorizations = {@Authorization(value = "jwtToken")})
     @ApiResponses(value = {
