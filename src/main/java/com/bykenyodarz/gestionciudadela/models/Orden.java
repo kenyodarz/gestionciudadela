@@ -31,6 +31,14 @@ public class Orden {
     private LocalDateTime createdAt;
 
     @Column
+    @NotNull
+    private LocalDateTime startDate;
+
+    @Column
+    @NotNull
+    private LocalDateTime endDate;
+
+    @Column
     private String estado;
 
     @OneToOne
@@ -40,7 +48,7 @@ public class Orden {
     private Boolean isActive;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
 
