@@ -18,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -144,7 +147,48 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
         });
 
         return ResponseEntity.ok().body(LocalDate.now()
-                .plusDays(Utilidades.calcularDias(LocalDateTime.now(),ordenNewest.get().getEndDate())));
+                .plusDays(Utilidades.calcularDias(LocalDateTime.now(), ordenNewest.get().getEndDate())));
+    }
+
+    @GetMapping("/informe")
+    @ApiOperation(value = "Entrega los Dias", notes = "servicio para crear o editar entidades",
+            authorizations = {@Authorization(value = "jwtToken")})
+    @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
+    public ResponseEntity<?> informe() {
+        HashMap<String, Object> responseMap = new HashMap<>();
+        List<Orden> listOrden = serviceAPI.getAll();
+        List<Edificacion> edificaciones = edificacionServiceAPI.getAll();
+
+        AtomicReference<Orden> ordenNewest = new AtomicReference<>(listOrden.get(0));
+
+        listOrden.forEach(ordenI -> {
+            if (ordenI.getCreatedAt().isAfter(ordenNewest.get().getCreatedAt())) {
+                ordenNewest.set(ordenI);
+            }
+        });
+
+        edificaciones.forEach(edificacion -> {
+            responseMap.put("Ordenes Pendientes: " + edificacion.getNombre(),
+                    listOrden.parallelStream().filter(
+                            orden -> orden.getEstado().equalsIgnoreCase("Pendiente")
+                    ).filter(
+                            orden -> orden.getEdificacion().getNombre().equalsIgnoreCase(edificacion.getNombre())
+                    ).count());
+            responseMap.put("Ordenes Terminadas: " + edificacion.getNombre(),
+                    listOrden.parallelStream().filter(
+                            orden -> orden.getEstado().equalsIgnoreCase("Finalizado")).filter(
+                            orden -> orden.getEdificacion().getNombre().equalsIgnoreCase(edificacion.getNombre())
+                    ).count());
+            responseMap.put("Ordenes En Progreso: " + edificacion.getNombre(),
+                    listOrden.parallelStream().filter(
+                            orden -> orden.getEstado().equalsIgnoreCase("En Progreso")).filter(
+                            orden -> orden.getEdificacion().getNombre().equalsIgnoreCase(edificacion.getNombre())
+                    ).count());
+        });
+        responseMap.put("Fecha de terminación del proyecto",
+                LocalDate.now()
+                        .plusDays(Utilidades.calcularDias(LocalDateTime.now(), ordenNewest.get().getEndDate())));
+        return ResponseEntity.ok().body(new TreeMap<>(responseMap));
     }
 
 }

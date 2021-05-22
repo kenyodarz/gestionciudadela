@@ -18,13 +18,13 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
-public class LanzadorHilos {
+public class Hilos {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LanzadorHilos.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Hilos.class);
 
     private final OrdenServiceAPI serviceAPI;
 
-    public LanzadorHilos(OrdenServiceAPI serviceAPI) {
+    public Hilos(OrdenServiceAPI serviceAPI) {
         this.serviceAPI = serviceAPI;
     }
 
@@ -37,8 +37,16 @@ public class LanzadorHilos {
     public void startScheduleAtFixedRateTask() {
         final LocalTime rn1 = LocalTime.of(6, 0, 0);
         final LocalTime rn2 = LocalTime.of(18, 0, 0);
+        LocalDate dateNow = LocalDate.now();
+        LocalDateTime horaDiurna = LocalDateTime.of(dateNow, rn1);
+        LocalDateTime horaNocturna =LocalDateTime.of(dateNow, rn2);
+        Date dia =  Date.from(horaDiurna.atZone(ZoneId.systemDefault()).toInstant());
+        Date noche =  Date.from(horaNocturna.atZone(ZoneId.systemDefault()).toInstant());
         Timer timer = new Timer();
-        // Tarea que toma alrededor de 2s
+
+        LOGGER.info("Ahora: -> {}", new Date());
+        LOGGER.info("Hilo dia Start: -> {}", dia);
+        LOGGER.info("Hilo noche Start: -> {}", noche);
 
 
         TimerTask task1 = new TimerTask() {
@@ -58,18 +66,18 @@ public class LanzadorHilos {
                             }
                         });
                     }
-                    LocalDate today = LocalDate.now().plusDays(1);
+                    LocalDate today = LocalDate.now();
                     if ((
                             today.isAfter(ChronoLocalDate.from(orderOldest.get().getStartDate()))
                                     || today.isEqual(ChronoLocalDate.from(orderOldest.get().getStartDate()))
                     )
                     ) {
-                        LOGGER.info("Ejecutando -> {}", today.plusDays(1));
+                        LOGGER.info("Ejecutando -> Hilo Diurno");
                         orderOldest.get().setEstado("En Progreso");
                         serviceAPI.save(orderOldest.get());
                     }
                 }
-                LOGGER.info("Fin del Hilo {}", Thread.currentThread().getName());
+                LOGGER.info("Fin del Hilo -> Diurno");
             }
         };
         TimerTask task2 = new TimerTask() {
@@ -90,36 +98,19 @@ public class LanzadorHilos {
                             }
                         });
                     }
-                    LocalDate today = LocalDate.now().plusDays(4);
+                    LocalDate today = LocalDate.now();
                     if ((
                             today.isAfter(ChronoLocalDate.from(orderOldest.get().getEndDate())) ||
                                     today.isEqual(ChronoLocalDate.from(orderOldest.get().getEndDate())))
                     ) {
-                        LOGGER.info("Ejecutando -> {}", today.plusDays(1));
+                        LOGGER.info("Ejecutando -> Hilo Nocturno");
                         orderOldest.get().setEstado("Finalizado");
                         serviceAPI.save(orderOldest.get());
                     }
                 }
-                LOGGER.info("Fin del Hilo {}", Thread.currentThread().getName());
+                LOGGER.info("Fin del Hilo -> Nocturno");
             }
         };
-        LocalDateTime localDateTime1 = LocalDateTime.now().plusSeconds(-11);
-        Date date = Date.from(localDateTime1.atZone(ZoneId.systemDefault()).toInstant());
-
-        LocalDate dateNow = LocalDate.now();
-
-        LocalDateTime localDateTime = LocalDateTime.of(dateNow, rn1);
-        LocalDateTime localDateTime2 =LocalDateTime.of(dateNow, rn2);
-
-        Date dia =  Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        Date noche =  Date.from(localDateTime2.atZone(ZoneId.systemDefault()).toInstant());
-
-        LOGGER.info("Ahora: -> {}", new Date());
-        LOGGER.info("Hilo dia Start: -> {}", dia);
-        LOGGER.info("Hilo noche Start: -> {}", noche);
-
-        System.out.println("now: " + new Date());
-        System.out.println("timer start: " + date);
         timer.scheduleAtFixedRate(task1, dia, 864000000);
         timer.scheduleAtFixedRate(task2, noche, 864000000);
 
