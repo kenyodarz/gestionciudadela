@@ -151,7 +151,7 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
     }
 
     @GetMapping("/informe")
-    @ApiOperation(value = "Entrega los Dias", notes = "servicio para crear o editar entidades",
+    @ApiOperation(value = "Entrega el informe del proyecto", notes = "servicio para generar el informe",
             authorizations = {@Authorization(value = "jwtToken")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     public ResponseEntity<?> informe() {
