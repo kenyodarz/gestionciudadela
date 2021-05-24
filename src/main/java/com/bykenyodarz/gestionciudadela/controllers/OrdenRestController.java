@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -158,7 +157,7 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
         HashMap<String, Object> responseMap = new HashMap<>();
         List<Orden> listOrden = serviceAPI.getAll();
         List<Edificacion> edificaciones = edificacionServiceAPI.getAll();
-
+        if(listOrden.isEmpty()) ResponseEntity.ok().body("No hay ordenes creadas en el proyecto.");
         AtomicReference<Orden> ordenNewest = new AtomicReference<>(listOrden.get(0));
 
         listOrden.forEach(ordenI -> {
