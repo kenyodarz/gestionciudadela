@@ -1,6 +1,5 @@
 package com.bykenyodarz.gestionciudadela.shared;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
@@ -8,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public abstract class GenericServiceImpl<E, ID extends Serializable> implements GenericServiceAPI<E, ID> {
+public abstract class GenericServiceImpl<E, V extends Serializable> implements GenericServiceAPI<E, V> {
 
     @Override
     public E save(E entity) {
@@ -16,12 +15,12 @@ public abstract class GenericServiceImpl<E, ID extends Serializable> implements 
     }
 
     @Override
-    public void delete(ID id) {
+    public void delete(V id) {
         getJpaRepository().deleteById(id);
     }
 
     @Override
-    public E get(ID id) {
+    public E get(V id) {
         // Optional
         Optional<E> optional = getJpaRepository().findById(id);
         // En caso de no encontrar el valor retornamos null
@@ -33,6 +32,4 @@ public abstract class GenericServiceImpl<E, ID extends Serializable> implements 
         return getJpaRepository().findAll();
     }
 
-    @Override
-    public abstract JpaRepository<E, ID> getJpaRepository();
 }

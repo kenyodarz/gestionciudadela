@@ -1,6 +1,5 @@
 package com.bykenyodarz.gestionciudadela.security.services;
 
-import com.bykenyodarz.gestionciudadela.security.models.Usuario;
 import com.bykenyodarz.gestionciudadela.security.repositories.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-        Usuario usuario = repository.findByUsername(nombreUsuario)
+        var usuario = repository.findByUsername(nombreUsuario)
                 .orElseThrow(() -> new UsernameNotFoundException("No se entro el nombre de Usuario: " + nombreUsuario));
         return UserDetailsImpl.build(usuario);
     }

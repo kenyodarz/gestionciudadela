@@ -17,16 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public abstract class GenericRestController<T, ID extends Serializable> {
+public abstract class GenericRestController<T, V extends Serializable> {
 
-    private final GenericServiceAPI<T, ID> serviceAPI;
+    private final GenericServiceAPI<T, V> serviceAPI;
 
-    public GenericRestController(GenericServiceAPI<T, ID> serviceAPI) {
+    protected GenericRestController(GenericServiceAPI<T, V> serviceAPI) {
         this.serviceAPI = serviceAPI;
     }
 
     // Validador de campos
-    public ResponseEntity<?> validar(BindingResult result) {
+    public ResponseEntity<Object> validar(BindingResult result) {
         Map<String, Object> errores = new HashMap<>();
         result.getFieldErrors().forEach(err -> errores.put(err.getField(),
                 " El campo " + err.getField() + " " + err.getDefaultMessage()));
@@ -46,7 +46,7 @@ public abstract class GenericRestController<T, ID extends Serializable> {
         return serviceAPI.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{v}")
     @ApiOperation(value = "Obtener una Entidad", notes = "servicio para obtener una Entidad",
             authorizations = {@Authorization(value = "jwtToken")})
     @ApiResponses(value = {
@@ -54,8 +54,8 @@ public abstract class GenericRestController<T, ID extends Serializable> {
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
-    public ResponseEntity<?> find(@PathVariable ID id) {
-        T entity = serviceAPI.get(id);
+    public ResponseEntity<Object> find(@PathVariable V v) {
+        var entity = serviceAPI.get(v);
         if (entity == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(entity);
     }
@@ -69,14 +69,14 @@ public abstract class GenericRestController<T, ID extends Serializable> {
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
-    public ResponseEntity<?> save(@Valid @RequestBody T entity, BindingResult result) {
+    public ResponseEntity<Object> save(@Valid @RequestBody T entity, BindingResult result) {
         if (result.hasErrors()) {
             return this.validar(result);
         }
         return ResponseEntity.status(HttpStatus.OK).body(serviceAPI.save(entity));
     }
 
-    @GetMapping("/delete/{id}")
+    @GetMapping("/delete/{v}")
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
     @ApiOperation(value = "Eliminar una Entidad", notes = "servicio para eliminar entidades",
             authorizations = {@Authorization(value = "jwtToken")})
@@ -85,10 +85,10 @@ public abstract class GenericRestController<T, ID extends Serializable> {
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
-    public ResponseEntity<?> delete(@PathVariable ID id) {
-        T entity = serviceAPI.get(id);
+    public ResponseEntity<Object> delete(@PathVariable V v) {
+        var entity = serviceAPI.get(v);
         if (entity != null) {
-            serviceAPI.delete(id);
+            serviceAPI.delete(v);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

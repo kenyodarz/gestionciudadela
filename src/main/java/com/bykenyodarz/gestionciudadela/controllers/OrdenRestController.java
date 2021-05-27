@@ -2,7 +2,6 @@ package com.bykenyodarz.gestionciudadela.controllers;
 
 import com.bykenyodarz.gestionciudadela.models.CantidadMateriales;
 import com.bykenyodarz.gestionciudadela.models.Edificacion;
-import com.bykenyodarz.gestionciudadela.models.Material;
 import com.bykenyodarz.gestionciudadela.models.Orden;
 import com.bykenyodarz.gestionciudadela.services.apis.CantidadMaterialesServiceAPI;
 import com.bykenyodarz.gestionciudadela.services.apis.EdificacionServiceAPI;
@@ -55,21 +54,21 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
             @ApiResponse(code = 401, message = "Usuario No Autorizado"),
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
-    public ResponseEntity<?> crearOrden(@PathVariable String edificio,
-                                        @PathVariable Double cooX,
-                                        @PathVariable Double cooY
+    public ResponseEntity<Object> createOrder(@PathVariable String edificio,
+                                              @PathVariable Double cooX,
+                                              @PathVariable Double cooY
     ) {
-        if (this.serviceAPI.existsByCoordenadaXAndCoordenadaY(cooX, cooY)) {
+        if (this.serviceAPI.existsByCoordenadaXAndCoordenadaY(cooX, cooY).booleanValue()) {
             return ResponseEntity.badRequest().body("ya existe un predio en esa coordenada");
         }
 
-        Edificacion edificacion = this.edificacionServiceAPI.findByNombre(edificio);
+        var edificacion = this.edificacionServiceAPI.findByNombre(edificio);
         if (edificacion == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tipo edificio no encontrado");
         }
 
         List<CantidadMateriales> listMateriales = this.cantidadMaterialesServiceAPI.findByEdificacion(edificio);
-        AtomicBoolean recursos = new AtomicBoolean(false);
+        var recursos = new AtomicBoolean(false);
         for (CantidadMateriales material : listMateriales) {
             int cantidadDisponible = material.getMaterial().getStock();
             int cantidadNecesaria = material.getCantidad();
@@ -79,13 +78,13 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
         }
 
         listMateriales.forEach(recurso -> {
-            Material material = materialServiceAPI.get(recurso.getMaterial().getIdMaterial());
+            var material = materialServiceAPI.get(recurso.getMaterial().getIdMaterial());
             material.setStock(material.getStock() - recurso.getCantidad());
             materialServiceAPI.save(material);
         });
 
         List<Orden> listOrden = this.serviceAPI.findAllByEstado();
-        Orden orden = new Orden();
+        var orden = new Orden();
 
         if (!listOrden.isEmpty()) {
             AtomicReference<Orden> orderOldest = new AtomicReference<>(listOrden.get(0));
@@ -131,7 +130,7 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
     @ApiOperation(value = "Entrega los Dias", notes = "servicio para crear o editar entidades",
             authorizations = {@Authorization(value = "jwtToken")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> obtenerDias() {
+    public ResponseEntity<Object> obtenerDias() {
         List<Orden> listOrden = serviceAPI.getAll();
         AtomicReference<Orden> orderOldest = new AtomicReference<>(listOrden.get(0));
         AtomicReference<Orden> ordenNewest = new AtomicReference<>(listOrden.get(0));
@@ -153,11 +152,11 @@ public class OrdenRestController extends GenericRestController<Orden, String> {
     @ApiOperation(value = "Entrega el informe del proyecto", notes = "servicio para generar el informe",
             authorizations = {@Authorization(value = "jwtToken")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> informe() {
+    public ResponseEntity<Object> informe() {
         HashMap<String, Object> responseMap = new HashMap<>();
         List<Orden> listOrden = serviceAPI.getAll();
         List<Edificacion> edificaciones = edificacionServiceAPI.getAll();
-        if(listOrden.isEmpty()) ResponseEntity.ok().body("No hay ordenes creadas en el proyecto.");
+        if (listOrden.isEmpty()) ResponseEntity.ok().body("No hay ordenes creadas en el proyecto.");
         AtomicReference<Orden> ordenNewest = new AtomicReference<>(listOrden.get(0));
 
         listOrden.forEach(ordenI -> {

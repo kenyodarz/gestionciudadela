@@ -1,8 +1,6 @@
 package com.bykenyodarz.gestionciudadela.controllers;
 
 import com.bykenyodarz.gestionciudadela.models.CantidadMateriales;
-import com.bykenyodarz.gestionciudadela.models.Edificacion;
-import com.bykenyodarz.gestionciudadela.models.Material;
 import com.bykenyodarz.gestionciudadela.services.apis.CantidadMaterialesServiceAPI;
 import com.bykenyodarz.gestionciudadela.services.apis.EdificacionServiceAPI;
 import com.bykenyodarz.gestionciudadela.services.apis.MaterialServiceAPI;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class CantidadMaterialesRestController extends GenericRestController<CantidadMateriales, String> {
     private final CantidadMaterialesServiceAPI serviceAPI;
     private final EdificacionServiceAPI edificacionServiceAPI;
-    private  final MaterialServiceAPI materialServiceAPI;
+    private final MaterialServiceAPI materialServiceAPI;
 
     public CantidadMaterialesRestController(CantidadMaterialesServiceAPI serviceAPI,
                                             EdificacionServiceAPI edificacionServiceAPI,
@@ -41,18 +39,18 @@ public class CantidadMaterialesRestController extends GenericRestController<Cant
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> crearMateriales(@PathVariable String nombre,
-                                             @PathVariable String identificador,
-                                             @PathVariable Integer cantidad){
-        Material material = materialServiceAPI.findByIdentificador(identificador);
+    public ResponseEntity<Object> crearMateriales(@PathVariable String nombre,
+                                                  @PathVariable String identificador,
+                                                  @PathVariable Integer cantidad) {
+        var material = materialServiceAPI.findByIdentificador(identificador);
         if (material == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró el material");
         }
-        Edificacion edificacion = edificacionServiceAPI.findByNombre(nombre);
+        var edificacion = edificacionServiceAPI.findByNombre(nombre);
         if (edificacion == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró tipo de edificio");
         }
-        CantidadMateriales cantidadMateriales = new CantidadMateriales();
+        var cantidadMateriales = new CantidadMateriales();
         cantidadMateriales.setCantidad(cantidad);
         cantidadMateriales.setMaterial(material);
         cantidadMateriales.setEdificacion(edificacion);
@@ -69,7 +67,7 @@ public class CantidadMaterialesRestController extends GenericRestController<Cant
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> findByEdificacion(@PathVariable String nombre) {
+    public ResponseEntity<Object> findByEdificacion(@PathVariable String nombre) {
         return ResponseEntity.ok().body(this.serviceAPI.findByEdificacion(nombre));
     }
 

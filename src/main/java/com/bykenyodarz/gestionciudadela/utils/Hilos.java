@@ -9,7 +9,10 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.chrono.ChronoLocalDate;
 import java.util.Date;
 import java.util.List;
@@ -35,14 +38,14 @@ public class Hilos {
 
     @PostConstruct
     public void startScheduleAtFixedRateTask() {
-        final LocalTime rn1 = LocalTime.of(6, 0, 0);
-        final LocalTime rn2 = LocalTime.of(18, 0, 0);
-        LocalDate dateNow = LocalDate.now();
-        LocalDateTime horaDiurna = LocalDateTime.of(dateNow, rn1);
-        LocalDateTime horaNocturna =LocalDateTime.of(dateNow, rn2);
-        Date dia =  Date.from(horaDiurna.atZone(ZoneId.systemDefault()).toInstant());
-        Date noche =  Date.from(horaNocturna.atZone(ZoneId.systemDefault()).toInstant());
-        Timer timer = new Timer();
+        final var rn1 = LocalTime.of(6, 0, 0);
+        final var rn2 = LocalTime.of(18, 0, 0);
+        var dateNow = LocalDate.now();
+        var horaDiurna = LocalDateTime.of(dateNow, rn1);
+        var horaNocturna = LocalDateTime.of(dateNow, rn2);
+        var dia = Date.from(horaDiurna.atZone(ZoneId.systemDefault()).toInstant());
+        var noche = Date.from(horaNocturna.atZone(ZoneId.systemDefault()).toInstant());
+        var timer = new Timer();
 
         LOGGER.info("Ahora: -> {}", new Date());
         LOGGER.info("Hilo dia Start: -> {}", dia);
@@ -66,7 +69,7 @@ public class Hilos {
                             }
                         });
                     }
-                    LocalDate today = LocalDate.now();
+                    var today = LocalDate.now();
                     if ((
                             today.isAfter(ChronoLocalDate.from(orderOldest.get().getStartDate()))
                                     || today.isEqual(ChronoLocalDate.from(orderOldest.get().getStartDate()))
@@ -98,7 +101,7 @@ public class Hilos {
                             }
                         });
                     }
-                    LocalDate today = LocalDate.now();
+                    var today = LocalDate.now();
                     if ((
                             today.isAfter(ChronoLocalDate.from(orderOldest.get().getEndDate())) ||
                                     today.isEqual(ChronoLocalDate.from(orderOldest.get().getEndDate())))

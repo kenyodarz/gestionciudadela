@@ -37,11 +37,11 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> save(@Valid @RequestBody Material entity, BindingResult result) {
+    public ResponseEntity<Object> save(@Valid @RequestBody Material entity, BindingResult result) {
         if (result.hasErrors()) {
             return this.validar(result);
         }
-        if(serviceAPI.existsByIdentificador(entity.getIdentificador())){
+        if (serviceAPI.existsByIdentificador(entity.getIdentificador()).booleanValue()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Este Identificador ya lo tiene otro producto!"));
@@ -58,8 +58,8 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> findMaterialWithStock(@PathVariable String identificador) {
-        Material material = this.serviceAPI.findMaterialByWithStock(identificador);
+    public ResponseEntity<Object> findMaterialWithStock(@PathVariable String identificador) {
+        var material = this.serviceAPI.findMaterialByWithStock(identificador);
         if (material == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Material no Encontrado");
         } else {
@@ -76,8 +76,8 @@ public class MaterialRestController extends GenericRestController<Material, Stri
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Material no encontrado")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> actualizarStock(@PathVariable String identificador, @PathVariable int cantidad) {
-        Material material = this.serviceAPI.findByIdentificador(identificador);
+    public ResponseEntity<Object> actualizarStock(@PathVariable String identificador, @PathVariable int cantidad) {
+        var material = this.serviceAPI.findByIdentificador(identificador);
         if (material == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Material no Encontrado");
         } else {

@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,8 +64,8 @@ public class AuthController {
             @ApiResponse(code = 403, message = "Recurso no disponible"),
             @ApiResponse(code = 404, message = "Recurso no encontrado")
     })
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
+    public ResponseEntity<Object> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -74,7 +73,8 @@ public class AuthController {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(new JwtResponse(jwt,
+        return ResponseEntity.ok(new JwtResponse(
+                jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
@@ -93,46 +93,47 @@ public class AuthController {
             @ApiResponse(code = 403, message = "Recurso no disponible"),
             @ApiResponse(code = 404, message = "Recurso no encontrado")
     })
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername()).booleanValue()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Este nombre de usuario ya existe!"));
         }
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail()).booleanValue()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Este email ya se encuentra en uso!"));
         }
 
         // Crear una nueva cuenta de usuario.
-        Usuario user = new Usuario(
+        var user = new Usuario(
                 signUpRequest.getNombre(),
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
         Set<String> strRoles = signUpRequest.getRoles();
         Set<Role> roles = new HashSet<>();
+        var errorMessage = "Error: Rol no encontrado.";
         if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
+            var userRole = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException(errorMessage));
             roles.add(userRole);
         } else {
             strRoles.forEach(rol -> {
-                switch (rol){
+                switch (rol) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
+                        var adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
+                                .orElseThrow(() -> new RuntimeException(errorMessage));
                         roles.add(adminRole);
                         break;
                     case "sup":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_SUPERVISOR)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
+                        var modRole = roleRepository.findByName(ERole.ROLE_SUPERVISOR)
+                                .orElseThrow(() -> new RuntimeException(errorMessage));
                         roles.add(modRole);
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
+                        var userRole = roleRepository.findByName(ERole.ROLE_USER)
+                                .orElseThrow(() -> new RuntimeException(errorMessage));
                         roles.add(userRole);
                 }
             });

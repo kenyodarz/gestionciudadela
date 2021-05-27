@@ -37,11 +37,11 @@ public class EdificacionRestController extends GenericRestController<Edificacion
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> save(@Valid @RequestBody Edificacion entity, BindingResult result) {
+    public ResponseEntity<Object> save(@Valid @RequestBody Edificacion entity, BindingResult result) {
         if (result.hasErrors()) {
             return this.validar(result);
         }
-        if (serviceAPI.existsByNombre(entity.getNombre())) {
+        if (serviceAPI.existsByNombre(entity.getNombre()).booleanValue()) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Este edificio ya existe!"));
@@ -59,8 +59,8 @@ public class EdificacionRestController extends GenericRestController<Edificacion
             @ApiResponse(code = 403, message = "Solicitud prohibida por el servidor"),
             @ApiResponse(code = 404, message = "Entidad no encontrada")})
     @PreAuthorize("hasRole('USER') or hasRole('SUPERVISOR') or hasRole('ADMIN')")
-    public ResponseEntity<?> findByNombre(@PathVariable String nombre) {
-        Edificacion edificacion = this.serviceAPI.findByNombre(nombre);
+    public ResponseEntity<Object> findByNombre(@PathVariable String nombre) {
+        var edificacion = this.serviceAPI.findByNombre(nombre);
         return (edificacion != null) ? ResponseEntity.ok().body(edificacion) :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).body("Edificación no encontrada");
     }
