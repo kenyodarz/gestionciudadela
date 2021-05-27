@@ -10,11 +10,12 @@
     </parent>
     <groupId>com.bykenyodarz</groupId>
     <artifactId>gestionciudadela</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>gestionciudadela</name>
     <description>Demo project for Spring Boot</description>
     <properties>
         <java.version>11</java.version>
+        <skipTests>true</skipTests>
     </properties>
     <dependencies>
         <dependency>
@@ -108,22 +109,25 @@
                     </excludes>
                 </configuration>
             </plugin>
-            <plugin>
+              <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.21.0</version>
                 <configuration>
                     <images>
                         <image>
-                            <name>kenyodarz/${project.build.finalName}</name>
+                            <name>kenyodarz/gestionciudadela:${project.version}</name>
                             <build>
                                 <from>openjdk:latest</from>
-                                <!-- Comando a ejecutarse en la imagen -->
-                                <entryPoint>java -Dspring.profiles.active=pnd -jar
-                                    ${project.basedir}/${project.build.finalName}.jar
+                                <entryPoint>
+                                    <exec>
+                                        <args>java</args>
+                                        <args>-Dspring.profiles.active=pnd</args>
+                                        <args>-jar</args>
+                                        <args>${project.build.finalName}.jar</args>
+                                    </exec>
                                 </entryPoint>
                                 <assembly>
-                                    <basedir>${project.basedir}</basedir>
                                     <descriptorRef>artifact</descriptorRef>
                                     <inline>
                                         <id>assembly</id>
@@ -135,7 +139,7 @@
                                     </inline>
                                 </assembly>
                                 <tags>
-                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                                 <ports>
                                     <port>8080</port>

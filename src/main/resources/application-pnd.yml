@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://postgres_server:5432/GESTION
     username: postgres
-    password: cdm
+    password: barcelona
     driver-class-name: org.postgresql.Driver
 
   jpa:
