@@ -2,21 +2,25 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>com.bykenyodarz</groupId>
     <artifactId>gestionciudadela</artifactId>
     <version>1.0</version>
     <name>gestionciudadela</name>
     <description>Demo project for Spring Boot</description>
+
     <properties>
         <java.version>11</java.version>
         <skipTests>true</skipTests>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -116,7 +120,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>kenyodarz/gestionciudadela:${project.version}</name>
+                            <name>kenyodarz/${project.build.finalName}:${project.version}</name>
                             <build>
                                 <from>openjdk:latest</from>
                                 <entryPoint>
@@ -124,10 +128,11 @@
                                         <args>java</args>
                                         <args>-Dspring.profiles.active=pnd</args>
                                         <args>-jar</args>
-                                        <args>${project.build.finalName}.jar</args>
+                                        <args>/app/${project.build.finalName}.jar</args>
                                     </exec>
                                 </entryPoint>
                                 <assembly>
+                                    <basedir>/app/</basedir>
                                     <descriptorRef>artifact</descriptorRef>
                                     <inline>
                                         <id>assembly</id>
@@ -139,6 +144,7 @@
                                     </inline>
                                 </assembly>
                                 <tags>
+                                    <tag>latest</tag>
                                     <tag>${project.version}</tag>
                                 </tags>
                                 <ports>
